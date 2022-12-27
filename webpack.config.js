@@ -10,6 +10,7 @@ module.exports = {
             metaDesc: 'Webpack Example Description',
             template: './src/index.html',
             filename: 'index.html',
+            favicon: './src/favicon.ico',
             inject: 'body'
         })
     ],
