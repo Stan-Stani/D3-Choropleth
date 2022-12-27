@@ -9,7 +9,7 @@ import { color, svg } from "d3";
 // Define global variables
 const WIDTH = 1366;
 const HEIGHT = 768;
-const LEGEND_LENGTH = 200;
+const LEGEND_LENGTH = 300;
 
 let data = {}
 
@@ -141,6 +141,7 @@ function buildLegend(data) {
         )
         .call(legendAxis)
 
+    let rectHeight = 20;
     let rectWidth = state.scales.eduToLegendPosition(colorExtentsForLegend[0][1]);
     legend
         .selectAll('rect')
@@ -148,7 +149,8 @@ function buildLegend(data) {
         .enter()
         .append('rect')
             .attr('x', d => state.scales.eduToLegendPosition(d[0]))
-            .attr('height', 5)
+            .attr('y', - rectHeight )
+            .attr('height', rectHeight)
             .attr('width', rectWidth)
             .attr('fill', d => state.scales.eduToColor(d[0]))
         
