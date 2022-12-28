@@ -23,6 +23,7 @@ const state = {
 const svgWrapper = d3.select('#svg-wrapper')
     .attr('viewBox', `0 0 ${WIDTH} ${HEIGHT}`);
 
+const mapItself = svgWrapper.append('g');
 
 fetch(
     "https://cdn.freecodecamp.org/testable-projects-fcc/data/choropleth_map/counties.json",
@@ -63,25 +64,33 @@ fetch(
         // q(geoGenerator(counties))
 
 
-        svgWrapper
-            .selectAll('path')
-            .data(counties.features)
-            .enter()
-            .append('path')
-            .attr('class', 'county')
-            .attr('data-fips', d => d.id)
-            .attr('d', d => { return geoGenerator(d) })
-            .attr('fill', d => {
-                let percentage = educationByFips[d.id].bachelorsOrHigher;
-                return state.scales.eduToColor(percentage)
-            })
-            .attr('stroke', 'white')
+        // mapItself
+        //     .selectAll('path')
+        //     .data(counties.features)
+        //     .enter()
+        //     .append('path')
+        //     .attr('class', 'county')
+        //     .attr('data-fips', d => d.id)
+        //     .attr('d', d => { return geoGenerator(d) })
+        //     .attr('fill', d => {
+        //         let percentage = educationByFips[d.id].bachelorsOrHigher;
+        //         return state.scales.eduToColor(percentage)
+        //     })
+        //     .attr('stroke', 'white')
 
-        svgWrapper
+        mapItself
             .append('path')
             .attr('d', d => geoGenerator(states))
             .attr('fill', 'none')
             .attr('stroke', 'white')
+            
+        mapItself
+            .attr(
+                'style', 
+                `transform: translate(${WIDTH / 2 - mapItself.node().getBBox().width / 2}px, 0px);`
+            )
+
+        q('bbox', mapItself.node().getBBox())
 
 
         buildLegend();
