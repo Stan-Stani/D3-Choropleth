@@ -31,7 +31,13 @@ const svgWrapper = d3.select('#svg-wrapper')
     .attr('viewBox', `0 0 ${WIDTH} ${HEIGHT}`);
 
 
-const mapItself = svgWrapper.append('g');
+const countyMap = svgWrapper.append('g')
+    .attr('id', 'counties')
+
+const stateMap = svgWrapper.append('g')
+    .attr('id', 'states')
+
+
 
 fetch(
     "https://cdn.freecodecamp.org/testable-projects-fcc/data/choropleth_map/counties.json",
@@ -72,7 +78,7 @@ fetch(
         // q(geoGenerator(counties))
 
 
-        mapItself
+        countyMap
             .selectAll('path')
             .data(counties.features)
             .enter()
@@ -89,20 +95,21 @@ fetch(
                 let bbox = this.getBBox();
 
                 // Draw bbox
-                // mapItself.append('rect')
+                // stateMap.append('rect')
                 //     .attr('x', bbox.x)
                 //     .attr('y', bbox.y)
                 //     .attr('width', bbox.width)
                 //     .attr('height', bbox.height)
-
-                let x = bbox.x + mapItselfXOffset + bbox.width + 5;
+                this.parentNode.appendChild(this);
+                this.setAttribute('style', 'stroke: black;')
+                let x = bbox.x + stateMapXOffset + bbox.width + 5;
                 let y = bbox.y + bbox.height + 5;
 
 
-                tooltip.setTextElement('bachelors-or-higher', 
+                tooltip.setTextElement('bachelors-or-higher',
                     JSON.stringify(educationByFips[d.id].bachelorsOrHigher) + "%"
                 )
-                tooltip.setTextElement('county-name', 
+                tooltip.setTextElement('county-name',
                     JSON.stringify(educationByFips[d.id].area_name)
                 )
                 tooltip.setTextElement('state',
@@ -110,31 +117,54 @@ fetch(
                 )
                 tooltip.setPos(x, y)
             })
+            .on('mouseout', function (e, d) {
+                this.setAttribute('style', '');
+            })
 
-        mapItself
+        q({ states })
+        stateMap
+            .selectAll('path')
+            .data(states.features)
+            .enter()
             .append('path')
-            .attr('d', d => geoGenerator(states))
+            .attr('d', d => geoGenerator(d))
             .attr('fill', 'none')
             .attr('stroke', 'white')
+            .on('mouseover', function (e, d) {
+                q('Egbert')
+                this.parentNode.appendChild(this);
+                this.setAttribute('style', 'stroke: black;')
+            })
+            .on('mouseout', function (e, d) {
+                this.setAttribute('style', '');
+            })
 
-        let mapItselfXOffset = WIDTH / 2 - mapItself.node().getBBox().width / 2;
+        let stateMapXOffset = WIDTH / 2 - countyMap.node().getBBox().width / 2;
 
-        mapItself
+
+        countyMap
             .attr(
                 'style',
-                `transform: translate(${mapItselfXOffset}px, 0px);`
+                `transform: translate(${stateMapXOffset}px, 0px);`
             )
 
-        
+        stateMap
+            .attr(
+                'style',
+                `transform: translate(${stateMapXOffset}px, 0px);`
+            )
+
+
+
         const tooltipConfig = {
             container: svgWrapper,
             containerWidth: WIDTH,
             containerHeight: HEIGHT,
             timeoutDurationInMs: 3000,
         }
-        
+
         let Tooltip = buildClasses()
-        
+
         const tooltip = new Tooltip(tooltipConfig);
 
 
