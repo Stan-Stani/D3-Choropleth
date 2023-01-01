@@ -116,13 +116,9 @@ fetch(
 
 
                 tooltip.setTextElement('bachelors-or-higher',
-                    JSON.stringify(educationByFips[d.id].bachelorsOrHigher) + "%"
-                )
-                tooltip.setTextElement('county-name',
-                    JSON.stringify(educationByFips[d.id].area_name)
-                )
-                tooltip.setTextElement('state',
-                    JSON.stringify(educationByFips[d.id].state)
+                    `${educationByFips[d.id].area_name}, ${educationByFips[d.id].state}: ${educationByFips[d.id].bachelorsOrHigher}%`
+
+
                 )
                 tooltip.setPos(x, y)
             })
@@ -294,8 +290,8 @@ function buildClasses() {
             this.container = config.container;
             this.containerWidth = config.containerWidth;
             this.containerHeight = config.containerHeight;
-            this.paddingHorizontal = config.paddingHorizontal ? config.paddingHorizontal : 0;
-            this.paddingVertical = config.paddingVertical ? config.paddingVertical : 0;
+            this.paddingHorizontal = config.paddingHorizontal ? config.paddingHorizontal : 5;
+            this.paddingVertical = config.paddingVertical ? config.paddingVertical : 5;
             this.timeoutDurationInMs = config.timeoutDurationInMs ? config.timeoutDurationInMs : 1000;
 
             this.tooltip = this.container
