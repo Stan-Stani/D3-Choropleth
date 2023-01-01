@@ -75,7 +75,8 @@ fetch(
         let geoGenerator = d3.geoPath()
             .projection(null);
 
-        // q(geoGenerator(counties))
+        let currentlyHighlightedCounty = null;
+        let currentlyHighlightedState = null;
 
 
         countyMap
@@ -92,6 +93,13 @@ fetch(
             })
             .attr('stroke', 'white')
             .on('mouseover', function (e, d) {
+                if (!currentlyHighlightedCounty) {
+                    currentlyHighlightedCounty = this;
+                } else {
+                    currentlyHighlightedCounty.setAttribute('stroke', 'white');
+                }
+
+
                 let bbox = this.getBBox();
 
                 // Draw bbox
@@ -100,8 +108,9 @@ fetch(
                 //     .attr('y', bbox.y)
                 //     .attr('width', bbox.width)
                 //     .attr('height', bbox.height)
+                currentlyHighlightedCounty = this;
                 this.parentNode.appendChild(this);
-                this.setAttribute('style', 'stroke: black;')
+                this.setAttribute('stroke', 'black')
                 let x = bbox.x + stateMapXOffset + bbox.width + 5;
                 let y = bbox.y + bbox.height + 5;
 
@@ -118,7 +127,7 @@ fetch(
                 tooltip.setPos(x, y)
             })
             .on('mouseout', function (e, d) {
-                this.setAttribute('style', '');
+                tooltip.startDisappearTimer();
             })
 
         q({ states })
@@ -128,16 +137,30 @@ fetch(
             .enter()
             .append('path')
             .attr('d', d => geoGenerator(d))
-            .attr('fill', 'none')
+            .attr('fill', 'rgba(0,0,0,0)')
             .attr('stroke', 'white')
             .on('mouseover', function (e, d) {
-                q('Egbert')
-                this.parentNode.appendChild(this);
-                this.setAttribute('style', 'stroke: black;')
+                !currentlyHighlightedState ? currentlyHighlightedState = this : null;
+
+                var handleStateHighlightBound = handleStateHighlight.bind(this);
+
+                handleStateHighlightBound();
+
+
+
             })
             .on('mouseout', function (e, d) {
-                this.setAttribute('style', '');
+                tooltip.doOnDisappear(() => {
+                    this.setAttribute(
+                        'stroke', 'white'
+                    );
+                    this.setAttribute('fill', 'rgba(0,0,0,0)');
+                    currentlyHighlightedCounty.setAttribute(
+                        'stroke', 'white'
+                    )
+                })
             })
+
 
         let stateMapXOffset = WIDTH / 2 - countyMap.node().getBBox().width / 2;
 
@@ -170,6 +193,24 @@ fetch(
 
         buildLegend();
 
+        // Adds highlight to state (and adds back fill to other states) 
+        // and removes fill of currently hovered state
+        // to allow below county to catch hover event and thus highlight.
+        // Sort of convoluted because state and county maps are not directly
+        // related as parent and child.
+        // If they were directly related, the hover event would bubble through
+        // both and this convolution would not be necessary.
+
+        function handleStateHighlight() {
+            
+            currentlyHighlightedState.setAttribute('fill', 'rgba(0,0,0,0)');
+            currentlyHighlightedState.setAttribute('stroke', 'white');
+
+            this.parentNode.appendChild(this);
+            this.setAttribute('stroke', 'black')
+            this.setAttribute('fill', 'none')
+            currentlyHighlightedState = this;
+        }
 
     })
 
@@ -349,6 +390,8 @@ function buildClasses() {
         }
 
         setPos(x, y, isHorizontallyCenteredOnPoint = false) {
+            this.timeoutId ? clearTimeout(this.timeoutId) : null;
+
             // Handle horizontally centering 
             let leftSideX;
             let topSideY;
@@ -386,10 +429,30 @@ function buildClasses() {
                 .attr('style', `transform: translate(${leftSideX}px, ${topSideY}px)`)
 
 
+
+
         }
 
         getTooltip() {
             return this.tooltip;
+        }
+
+        doOnDisappear(func) {
+            if (this.onDisappear) {
+                this.onDisappear.push(func);
+            } else {
+                this.onDisappear = [];
+                this.onDisappear.push(func);
+            }
+        }
+
+        startDisappearTimer() {
+            this.timeoutId = setTimeout(() => {
+                this.disappear();
+                this.onDisappear ? this.onDisappear.forEach((element) => {
+                    element();
+                }) : null;
+            }, this.timeoutDurationInMs);
         }
 
         disappear() {

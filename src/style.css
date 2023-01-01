@@ -48,10 +48,10 @@ body {
    
 }
 
-.county:hover {
+/* .county:hover {
     stroke: black;
     stroke-width: 5px;
-}
+} */
 
 #tooltip {
     pointer-events: none;
