@@ -135,7 +135,8 @@ fetch(
 
         let mapBBox = countyMap.node().getBBox()
         svgWrapper
-            .attr('viewBox', `0 0 ${mapBBox.width} ${mapBBox.height}`);
+            .attr('viewBox', `0 0 ${mapBBox.width + mapBBox.x} ${mapBBox.height + mapBBox.y}`);
+            q(mapBBox.x, mapBBox.y)
 
 
         q({ states })
