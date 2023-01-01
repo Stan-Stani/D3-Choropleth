@@ -2,6 +2,7 @@
 // it highlight stays and does not timeout
 // TODO: Add way to zoom in as certain places e.g. around DC are too small to be
 // highlighted
+// TODO: Correct width and height passed to tooltip class
 
 import css from "./style.css";
 import * as topojson from 'topojson-client';
