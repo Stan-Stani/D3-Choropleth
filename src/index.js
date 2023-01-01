@@ -118,7 +118,7 @@ fetch(
                 tooltip.setTextElement('bachelors-or-higher',
                     `${educationByFips[d.id].area_name},\
                      ${educationByFips[d.id].state}:\
-                      ${educationByFips[d.id].bachelorsOrHigher}%`
+                     ${educationByFips[d.id].bachelorsOrHigher}%`
 
 
                 )
