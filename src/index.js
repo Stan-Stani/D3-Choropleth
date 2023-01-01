@@ -1,3 +1,8 @@
+// TODO: Debug highlighting just the state outline and then mousing out as
+// it highlight stays and does not timeout
+// TODO: Add way to zoom in as certain places e.g. around DC are too small to be
+// highlighted
+
 import css from "./style.css";
 import * as topojson from 'topojson-client';
 import * as d3 from 'd3';
@@ -238,11 +243,11 @@ function buildScales(educationData) {
     q({ extent })
 
     state.scales.eduToColor = d3.scaleQuantize()
-        .domain([extent[0], extent[1]])
+        .domain([0, extent[1]])
         .range(state.palettesArr[state.paletteIndex].colors)
 
     state.scales.eduToLegendPosition = d3.scaleLinear()
-        .domain([extent[0], extent[1]])
+        .domain([0, extent[1]])
         .range([0, LEGEND_LENGTH])
 
 }
@@ -254,15 +259,24 @@ function buildLegend(data) {
     });
     q(colorExtentsForLegend)
 
-
+    let tickValues = colorExtentsForLegend.map(element => element[1]);
+    tickValues.unshift(0);
     let legendAxis = d3.axisBottom(state.scales.eduToLegendPosition)
-        .tickValues(colorExtentsForLegend.map(element => element[1]));
+        .tickValues(tickValues)
+       
+        
     let legend = svgWrapper.append('g')
         .attr('id', 'legend-axis')
         .attr('style', `transform: translate(${20}px,
                 ${HEIGHT - 30}px);`
         )
         .call(legendAxis)
+
+        legend.selectAll('text')
+            .text(function () {
+                return this.innerHTML + '%';
+            })
+            
 
     let rectHeight = 20;
     let rectWidth = state.scales.eduToLegendPosition(colorExtentsForLegend[0][1]);
