@@ -33,7 +33,7 @@ const state = {
 
 
 const svgWrapper = d3.select('#svg-wrapper')
-    .attr('viewBox', `0 0 ${WIDTH} ${HEIGHT}`);
+    // .attr('viewBox', `0 0 ${WIDTH} ${HEIGHT}`);
 
 
 const countyMap = svgWrapper.append('g')
@@ -133,6 +133,11 @@ fetch(
                 tooltip.startDisappearTimer();
             })
 
+        let mapBBox = countyMap.node().getBBox()
+        svgWrapper
+            .attr('viewBox', `0 0 ${mapBBox.width} ${mapBBox.height}`);
+
+
         q({ states })
         stateMap
             .selectAll('path')
@@ -165,7 +170,7 @@ fetch(
             })
 
 
-        let stateMapXOffset = WIDTH / 2 - countyMap.node().getBBox().width / 2;
+        let stateMapXOffset = 0;
 
 
         countyMap
