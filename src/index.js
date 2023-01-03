@@ -36,9 +36,8 @@ const state = {
     scales: {}
 };
 
-
 const svgWrapper = d3.select('#svg-wrapper')
-// .attr('viewBox', `0 0 ${WIDTH} ${HEIGHT}`);
+ 
 
 
 const countyMap = svgWrapper.append('g')
@@ -79,7 +78,7 @@ fetch(
 
         let counties = topojson.feature(data.topojson, 'counties')
         let states = topojson.feature(data.topojson, 'states')
-        q(data)
+        
         let projection = d3.geoEquirectangular();
 
         let geoGenerator = d3.geoPath()
@@ -138,8 +137,9 @@ fetch(
             })
 
         let mapBBox = countyMap.node().getBBox()
-        q(mapBBox)
+        
 
+        q({mapBBox})
         let mapVisibleWidth = mapBBox.width + mapBBox.x;
         let mapVisibleHeight = mapBBox.height + mapBBox.y;
 
@@ -153,7 +153,7 @@ fetch(
         // debug.drawBBox(svgWrapper, countyMap)
         
 
-        q({ states })
+        
         stateMap
             .selectAll('path')
             .data(states.features)
@@ -204,8 +204,8 @@ fetch(
 
         const tooltipConfig = {
             container: svgWrapper,
-            containerWidth: WIDTH,
-            containerHeight: HEIGHT,
+            containerWidth: mapVisibleWidth,
+            containerHeight: mapVisibleHeight,
             timeoutDurationInMs: 1000,
         }
 
@@ -260,7 +260,7 @@ function buildScales(educationData) {
 
 
     let extent = d3.extent(educationData, element => element.bachelorsOrHigher)
-    q({ extent })
+    
 
     state.scales.eduToColor = d3.scaleQuantize()
         .domain([0, extent[1]])
@@ -277,7 +277,6 @@ function buildLegend(data) {
     let colorExtentsForLegend = colorScaleRange.map((color, index) => {
         return state.scales.eduToColor.invertExtent(color);
     });
-    q(colorExtentsForLegend)
 
     let tickValues = colorExtentsForLegend.map(element => element[1]);
     tickValues.unshift(0);
@@ -435,12 +434,14 @@ function buildClasses() {
                 topSideY = y;
             }
 
+            
 
             // Reposition if overflow would happen
             let rightSideX = leftSideX + parseFloat(this.tooltipRect.attr('width'));
 
             let rectHeightInPixels = parseFloat(this.tooltipRect.attr('height')) * this.#pixelsPerEm();
             let bottomSideY = topSideY + rectHeightInPixels;
+
 
             if (leftSideX < 0) {
                 leftSideX = 0;
