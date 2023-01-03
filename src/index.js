@@ -3,6 +3,8 @@
 // TODO: Add way to zoom in as certain places e.g. around DC are too small to be
 // highlighted
 // TODO: Correct width and height passed to tooltip class
+// TODO: Debug part of Alaska getting cut off when svgWrapper width is not 100%.
+    // Hint: Search debug.drawBBox and enable it
 
 import css from "./style.css";
 import * as topojson from 'topojson-client';
@@ -34,7 +36,7 @@ const state = {
 
 
 const svgWrapper = d3.select('#svg-wrapper')
-    // .attr('viewBox', `0 0 ${WIDTH} ${HEIGHT}`);
+// .attr('viewBox', `0 0 ${WIDTH} ${HEIGHT}`);
 
 
 const countyMap = svgWrapper.append('g')
@@ -92,6 +94,7 @@ fetch(
             .append('path')
             .attr('class', 'county')
             .attr('data-fips', d => d.id)
+            .attr('data-education', d => educationByFips[d.id].bachelorsOrHigher)
             .attr('d', d => { return geoGenerator(d) })
             .attr('fill', d => {
                 let percentage = educationByFips[d.id].bachelorsOrHigher;
@@ -108,12 +111,7 @@ fetch(
 
                 let bbox = this.getBBox();
 
-                // Draw bbox
-                // stateMap.append('rect')
-                //     .attr('x', bbox.x)
-                //     .attr('y', bbox.y)
-                //     .attr('width', bbox.width)
-                //     .attr('height', bbox.height)
+
                 currentlyHighlightedCounty = this;
                 this.parentNode.appendChild(this);
                 this.setAttribute('stroke', 'black')
@@ -135,10 +133,20 @@ fetch(
             })
 
         let mapBBox = countyMap.node().getBBox()
-        svgWrapper
-            .attr('viewBox', `0 0 ${mapBBox.width + mapBBox.x} ${mapBBox.height + mapBBox.y}`);
-            q(mapBBox.x, mapBBox.y)
+        q(mapBBox)
 
+        let mapVisibleWidth = mapBBox.width + mapBBox.x;
+        let mapVisibleHeight = mapBBox.height + mapBBox.y;
+
+        svgWrapper
+            .attr('viewBox', `0 0 ${mapVisibleWidth} ${mapVisibleHeight}`)
+            .attr('preserveAspectRatio', 'xMidYMid')
+
+
+
+        // debug
+        // debug.drawBBox(svgWrapper, countyMap)
+        
 
         q({ states })
         stateMap
@@ -212,7 +220,7 @@ fetch(
         // both and this convolution would not be necessary.
 
         function handleStateHighlight() {
-            
+
             currentlyHighlightedState.setAttribute('fill', 'rgba(0,0,0,0)');
             currentlyHighlightedState.setAttribute('stroke', 'white');
 
@@ -270,8 +278,8 @@ function buildLegend(data) {
     tickValues.unshift(0);
     let legendAxis = d3.axisBottom(state.scales.eduToLegendPosition)
         .tickValues(tickValues)
-       
-        
+
+
     let legend = svgWrapper.append('g')
         .attr('id', 'legend-axis')
         .attr('style', `transform: translate(${20}px,
@@ -279,11 +287,11 @@ function buildLegend(data) {
         )
         .call(legendAxis)
 
-        legend.selectAll('text')
-            .text(function () {
-                return this.innerHTML + '%';
-            })
-            
+    legend.selectAll('text')
+        .text(function () {
+            return this.innerHTML + '%';
+        })
+
 
     let rectHeight = 20;
     let rectWidth = state.scales.eduToLegendPosition(colorExtentsForLegend[0][1]);
@@ -489,6 +497,19 @@ function buildClasses() {
 }
 
 
+// Debug object
+
+let debug = {
+    drawBBox: function (container, element) {
+        let rect = element.node().getBBox();
+            
+        container.append('rect')
+            .attr('x', rect.x)
+            .attr('y', rect.y)
+            .attr('width', rect.width)
+            .attr('height', rect.height)
+    }
+}
 
 // utility functions
 function q(...input) {
