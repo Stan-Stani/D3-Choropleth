@@ -127,6 +127,9 @@ fetch(
 
                 )
                 tooltip.setPos(x, y)
+                // fCC attributes for testing
+                tooltip.getTooltip()
+                    .attr('data-education', educationByFips[d.id].bachelorsOrHigher);
             })
             .on('mouseout', function (e, d) {
                 tooltip.startDisappearTimer();
@@ -201,7 +204,7 @@ fetch(
             container: svgWrapper,
             containerWidth: WIDTH,
             containerHeight: HEIGHT,
-            timeoutDurationInMs: 3000,
+            timeoutDurationInMs: 1000,
         }
 
         let Tooltip = buildClasses()
@@ -281,9 +284,9 @@ function buildLegend(data) {
 
 
     let legend = svgWrapper.append('g')
-        .attr('id', 'legend-axis')
-        .attr('style', `transform: translate(${20}px,
-                ${HEIGHT - 30}px);`
+        .attr('id', 'legend')
+        .attr('style', `transform: translate(${565}px,
+                ${50}px);`
         )
         .call(legendAxis)
 
