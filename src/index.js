@@ -3,6 +3,8 @@
 // TODO: Add way to zoom in as certain places e.g. around DC are too small to be
 // highlighted
 // TODO: Correct width and height passed to tooltip class
+
+// IMPORTANT 
 // TODO: Debug part of Alaska getting cut off when svgWrapper width is not 100%.
     // Hint: Search debug.drawBBox and enable it
 
