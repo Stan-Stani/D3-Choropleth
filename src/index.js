@@ -111,7 +111,7 @@ fetch(
 
 
                 let bbox = this.getBBox();
-
+                debug
 
                 currentlyHighlightedCounty = this;
                 this.parentNode.appendChild(this);
@@ -142,6 +142,7 @@ fetch(
         q({mapBBox})
         let mapVisibleWidth = mapBBox.width + mapBBox.x;
         let mapVisibleHeight = mapBBox.height + mapBBox.y;
+        console.log({mapVisibleWidth, mapVisibleHeight})
 
         svgWrapper
             .attr('viewBox', `0 0 ${mapVisibleWidth} ${mapVisibleHeight}`)
